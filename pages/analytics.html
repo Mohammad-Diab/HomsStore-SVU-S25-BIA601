@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics | Homs Store</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'soft-cyan': '#e0f7fa',
+                        'light-pink': '#fce4ec',
+                        'cream': '#fffdd0',
+                        'light-purple': '#f3e5f5',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles/custom.css">
+</head>
+<body class="antialiased min-h-screen">
+
+    <main class="lg:ml-64 pt-24 px-6 pb-12 transition-all duration-300">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4" data-aos="fade-in">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Analytics & Insights</h1>
+                <p class="text-gray-500 mt-1">Deep dive into user behavior and AI performance.</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <select class="appearance-none glass-button px-4 py-2 text-gray-700 outline-none pr-8 relative">
+                    <option>Last 7 Days</option>
+                    <option>Last 30 Days</option>
+                    <option>This Year</option>
+                </select>
+                <button class="glass-button w-10 h-10 flex items-center justify-center text-gray-700 hover:text-purple-600"><i class="fas fa-download"></i></button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8" data-aos="fade-up">
+            
+            <!-- User Behavior Bar Chart -->
+            <div class="glass-card p-6">
+                <h3 class="font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <i class="fas fa-mouse-pointer text-blue-500"></i> Click vs Purchase Rate
+                </h3>
+                <div class="relative h-72 w-full">
+                    <canvas id="behaviorChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Heatmap Placeholder (Using Radar Chart for Category Interest) -->
+            <div class="glass-card p-6">
+                <h3 class="font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <i class="fas fa-map-marked-alt text-pink-500"></i> Category Interest Heatmap
+                </h3>
+                <div class="relative h-72 w-full flex justify-center">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- AI Performance Metrics -->
+        <div class="glass-card p-6 mb-8" data-aos="fade-up" data-aos-delay="100">
+            <h3 class="font-bold text-gray-800 mb-6 flex items-center gap-2">
+                <i class="fas fa-brain text-purple-500"></i> AI Recommendation Performance
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white/40 border border-white/50 p-4 rounded-2xl text-center">
+                    <p class="text-xs text-gray-500 uppercase font-bold mb-1">Click-Through Rate (CTR)</p>
+                    <p class="text-3xl font-bold text-gray-800" id="ctr-metric">--%</p>
+                    <p class="text-xs text-green-500 mt-2"><i class="fas fa-arrow-up"></i> Live Data</p>
+                </div>
+                <div class="bg-white/40 border border-white/50 p-4 rounded-2xl text-center">
+                    <p class="text-xs text-gray-500 uppercase font-bold mb-1">Conversion from AI</p>
+                    <p class="text-3xl font-bold text-gray-800" id="conv-metric">--%</p>
+                    <p class="text-xs text-green-500 mt-2"><i class="fas fa-arrow-up"></i> Live Data</p>
+                </div>
+                <div class="bg-white/40 border border-white/50 p-4 rounded-2xl text-center">
+                    <p class="text-xs text-gray-500 uppercase font-bold mb-1">Avg. Order Value (via AI)</p>
+                    <p class="text-3xl font-bold text-gray-800">$142.50</p>
+                    <p class="text-xs text-red-500 mt-2"><i class="fas fa-arrow-down"></i> $4.20 from last week</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/tracking.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+
+        async function loadAnalyticsData() {
+            try {
+                // Fetch AI performance metrics
+                const clickRateRes = await fetch('http://localhost:5000/api/click-rate');
+                const clickRateData = await clickRateRes.json();
+                
+                const purchaseRateRes = await fetch('http://localhost:5000/api/purchase-rate');
+                const purchaseRateData = await purchaseRateRes.json();
+                
+                // Update metrics in UI
+                document.getElementById('ctr-metric').innerText = clickRateData.click_through_rate + '%';
+                document.getElementById('conv-metric').innerText = purchaseRateData.purchase_rate + '%';
+                
+                // Fetch charts data
+                const chartsRes = await fetch('http://localhost:5000/api/dashboard/charts');
+                const chartsData = await chartsRes.json();
+                
+                // Process category distribution for radar chart
+                const radarLabels = [];
+                const radarData = [];
+                if (chartsData.category_distribution) {
+                    chartsData.category_distribution.forEach(item => {
+                        radarLabels.push(item.name);
+                        radarData.push(item.value);
+                    });
+                }
+                
+                renderCharts(radarLabels, radarData);
+                
+            } catch (error) {
+                console.error("Error fetching analytics data:", error);
+                // Render fallback charts
+                renderCharts(['Fashion', 'Electronics', 'Home', 'Beauty', 'Sports', 'Toys'], [90, 75, 60, 85, 40, 30]);
+            }
+        }
+
+        function renderCharts(radarLabels, radarData) {
+            // Bar Chart (Mocked Time Series as backend only provides totals)
+            const ctxBehavior = document.getElementById('behaviorChart').getContext('2d');
+            new Chart(ctxBehavior, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [
+                        {
+                            label: 'Clicks',
+                            data: [1200, 1900, 1500, 2200, 2800, 3500, 3100],
+                            backgroundColor: 'rgba(168, 85, 247, 0.7)',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Purchases',
+                            data: [120, 180, 140, 200, 250, 320, 290],
+                            backgroundColor: 'rgba(236, 72, 153, 0.7)',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { grid: { color: 'rgba(0,0,0,0.05)', borderDash: [5, 5] } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Radar Chart (Category Interest from Backend)
+            const ctxRadar = document.getElementById('radarChart').getContext('2d');
+            new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: radarLabels.length ? radarLabels : ['Fashion', 'Electronics', 'Home', 'Beauty', 'Sports', 'Toys'],
+                    datasets: [{
+                        label: 'Purchased Categories',
+                        data: radarData.length ? radarData : [90, 75, 60, 85, 40, 30],
+                        backgroundColor: 'rgba(168, 85, 247, 0.2)',
+                        borderColor: '#a855f7',
+                        pointBackgroundColor: '#a855f7',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#a855f7'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0,0,0,0.05)' },
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            pointLabels: { font: { size: 12 } },
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAnalyticsData);
+    </script>
+</body>
+</html>

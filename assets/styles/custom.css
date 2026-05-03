@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --color-soft-cyan: #e0f7fa;
+  --color-light-pink: #fce4ec;
+  --color-cream: #fffdd0;
+  --color-light-purple: #f3e5f5;
+  
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: linear-gradient(135deg, var(--color-soft-cyan) 0%, var(--color-light-purple) 50%, var(--color-light-pink) 100%);
+  background-attachment: fixed;
+  color: #333;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: var(--glass-shadow);
+  border-radius: 24px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.1);
+}
+
+.glass-button {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+}
+
+.glass-button:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: scale(1.05);
+}
+
+/* Floating Animation */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.floating {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(200, 200, 200, 0.5);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 150, 150, 0.7);
+}
+
+/* Smooth Image Loading */
+img {
+  transition: opacity 0.3s ease;
+}
+img[loading] {
+  opacity: 0;
+}
+img.loaded {
+  opacity: 1;
+}
+
+/* Text Gradients */
+.text-gradient {
+  background: linear-gradient(to right, #8e2de2, #4a00e0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

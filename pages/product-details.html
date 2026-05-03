@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | Homs Store</title>
+    <meta name="description" content="View product details at Homs Store.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { theme: { extend: { colors: { 'soft-cyan': '#e0f7fa', 'light-pink': '#fce4ec', 'cream': '#fffdd0', 'light-purple': '#f3e5f5' } } } }</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles/custom.css">
+    <style>
+        .line-clamp-2 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0
+            }
+
+            100% {
+                background-position: -200% 0
+            }
+        }
+
+        .thumb-active {
+            border-color: #a855f7 !important;
+            opacity: 1 !important
+        }
+
+        .qty-btn {
+            transition: all .2s
+        }
+
+        .qty-btn:hover {
+            background: rgba(168, 85, 247, .1);
+            color: #a855f7
+        }
+    </style>
+</head>
+
+<body class="antialiased min-h-screen">
+
+    <main class="lg:ml-64 pt-24 px-6 pb-12 transition-all duration-300">
+
+        <!-- Breadcrumb (dynamic) -->
+        <nav class="flex text-gray-500 text-sm mb-8 items-center gap-1" id="breadcrumb-nav" data-aos="fade-in">
+            <a href="../index.html" class="hover:text-purple-600 transition">Home</a>
+            <i class="fas fa-chevron-right text-[10px] mx-1"></i>
+            <a href="products.html" id="bc-category" class="hover:text-purple-600 transition">Products</a>
+            <i class="fas fa-chevron-right text-[10px] mx-1"></i>
+            <span class="text-gray-800 font-medium truncate max-w-xs" id="bc-name">Loading...</span>
+        </nav>
+
+        <!-- Product Details Container -->
+        <div class="glass-card p-6 md:p-10 mb-12" data-aos="fade-up" id="product-container">
+            <!-- Skeleton -->
+            <div class="flex flex-col md:flex-row gap-10" id="product-skeleton">
+                <div class="w-full md:w-1/2">
+                    <div class="w-full aspect-[4/5] skeleton rounded-3xl mb-4"></div>
+                    <div class="flex gap-3">
+                        <div class="w-20 h-24 skeleton rounded-xl"></div>
+                        <div class="w-20 h-24 skeleton rounded-xl"></div>
+                        <div class="w-20 h-24 skeleton rounded-xl"></div>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 space-y-4">
+                    <div class="h-4 skeleton rounded w-1/4"></div>
+                    <div class="h-8 skeleton rounded w-3/4"></div>
+                    <div class="h-4 skeleton rounded w-1/2"></div>
+                    <div class="h-10 skeleton rounded w-1/3"></div>
+                    <div class="h-4 skeleton rounded w-full"></div>
+                    <div class="h-4 skeleton rounded w-5/6"></div>
+                    <div class="h-14 skeleton rounded-xl w-full"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Specifications Section (dynamic) -->
+        <div class="glass-card p-6 mb-12 hidden" id="specs-section" data-aos="fade-up">
+            <h2 class="text-xl font-bold text-gray-800 mb-4"><i
+                    class="fas fa-list-ul text-purple-500 mr-2"></i>Specifications</h2>
+            <div class="spec-grid" id="specs-container"></div>
+        </div>
+
+        <!-- Similar Products -->
+        <section data-aos="fade-up">
+            <div class="flex justify-between items-end mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">You Might Also Like</h2>
+                <a href="products.html" id="similar-view-all"
+                    class="text-sm text-purple-600 font-medium hover:underline">View All</a>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6" id="similar-container">
+                ${Array(4).fill('<div class="glass-card p-3">
+                    <div class="w-full aspect-[4/5] skeleton rounded-xl mb-3"></div>
+                    <div class="h-4 skeleton rounded w-3/4 mb-2"></div>
+                    <div class="h-4 skeleton rounded w-1/3"></div>
+                </div>').join('')}
+            </div>
+        </section>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/tracking.js"></script>
+    <script>
+        AOS.init({ duration: 700, once: true });
+
+        let currentProduct = null;
+
+        // ── Get gallery images for product ───────────────────────────────────────────
+        function getGalleryImages(product) {
+            const base = getProductImageUrl(product);
+            const pid = parseInt(product.product_id) || 1;
+            const cat = (product.category || 'product').toLowerCase();
+            // Generate 3 different gallery images using different picsum seeds
+            const extraSeeds = [pid + 300, pid + 400, pid + 500];
+            return [
+                base,
+                `https://picsum.photos/seed/${extraSeeds[0]}/800/800`,
+                `https://picsum.photos/seed/${extraSeeds[1]}/800/800`,
+            ];
+        }
+
+        // ── Render product ────────────────────────────────────────────────────────────
+        function renderProduct(p) {
+            currentProduct = p;
+            const rating = parseFloat(p.rating) || 4.0;
+            const price = parseFloat(p.price) || 0;
+            const stock = parseInt(p.stock) || 0;
+            const images = getGalleryImages(p);
+
+            // Update meta
+            document.title = `${p.name} | Homs Store`;
+
+            // Breadcrumb
+            document.getElementById('bc-name').textContent = p.name;
+            const bcCat = document.getElementById('bc-category');
+            bcCat.textContent = p.category;
+            bcCat.href = `products.html?category=${encodeURIComponent(p.category)}`;
+            document.getElementById('similar-view-all').href = `products.html?category=${encodeURIComponent(p.category)}`;
+
+            // Stars HTML
+            const starsHtml = renderStars(rating);
+            const stockBadge = stock === 0
+                ? '<span class="text-red-500 font-medium"><i class="fas fa-times-circle mr-1"></i>Out of Stock</span>'
+                : stock < 20
+                    ? `<span class="text-orange-500 font-medium"><i class="fas fa-exclamation-circle mr-1"></i>Only ${stock} left</span>`
+                    : '<span class="text-green-500 font-medium"><i class="fas fa-check-circle mr-1"></i>In Stock</span>';
+
+            document.getElementById('product-skeleton').outerHTML = `
+    <div class="flex flex-col md:flex-row gap-10" id="product-content">
+        <!-- Gallery -->
+        <div class="w-full md:w-1/2">
+            <div class="relative rounded-3xl overflow-hidden aspect-[4/5] mb-4 bg-white/50 border border-white/60 shadow-sm">
+                <img id="main-img" src="${images[0]}" alt="${p.name}"
+                    class="w-full h-full object-cover transition-opacity duration-500"
+                    onerror="this.onerror=null;this.src='https://picsum.photos/seed/${p.product_id + 200}/800/800'">
+                <div class="absolute top-4 left-4 bg-purple-100 text-purple-600 px-3 py-1 rounded-xl text-sm font-bold shadow-sm">
+                    ${p.category}
+                </div>
+                <button class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md text-gray-500 hover:text-pink-500 flex items-center justify-center shadow-md transition" id="wishlist-btn">
+                    <i class="far fa-heart text-xl"></i>
+                </button>
+            </div>
+            <!-- Thumbnails -->
+            <div class="flex gap-3" id="thumb-gallery">
+                ${images.map((img, i) => `
+                <button class="thumb-btn w-20 h-24 rounded-xl overflow-hidden border-2 ${i === 0 ? 'border-purple-400' : 'border-transparent opacity-60'} hover:opacity-100 transition focus:outline-none"
+                    data-src="${img}">
+                    <img src="${img}" class="w-full h-full object-cover"
+                        onerror="this.parentElement.style.display='none'">
+                </button>`).join('')}
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="w-full md:w-1/2 flex flex-col">
+            <!-- Rating & Stock -->
+            <div class="flex items-center gap-3 mb-3 flex-wrap">
+                <div class="flex items-center gap-1 text-sm">${starsHtml}</div>
+                <span class="text-sm text-gray-500">${rating.toFixed(1)} / 5.0</span>
+                <span class="text-gray-300">|</span>
+                ${stockBadge}
+            </div>
+
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">${p.name}</h1>
+
+            <div class="mb-6 flex items-end gap-4">
+                <span class="text-4xl font-bold text-gray-900">$${price.toFixed(2)}</span>
+            </div>
+
+            <p class="text-gray-600 mb-6 leading-relaxed">${p.description || 'Premium quality product with exceptional features and build quality.'}</p>
+
+            <!-- Quantity & Add to Cart -->
+            <div class="flex gap-4 mb-6">
+                <div class="glass-card px-4 py-2 flex items-center justify-between w-32 border border-white/80">
+                    <button class="qty-btn text-gray-500 px-2" id="qty-minus"><i class="fas fa-minus text-xs"></i></button>
+                    <span class="font-bold text-gray-800" id="qty-display">1</span>
+                    <button class="qty-btn text-gray-500 px-2" id="qty-plus"><i class="fas fa-plus text-xs"></i></button>
+                </div>
+                <button id="add-to-cart-btn"
+                    class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition flex items-center justify-center gap-2 ${stock === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+                    ${stock === 0 ? 'disabled' : ''}>
+                    <i class="fas fa-shopping-bag"></i> ${stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                </button>
+            </div>
+
+            <!-- Delivery Info -->
+            <div class="space-y-3">
+                <div class="flex items-center gap-4 text-sm">
+                    <div class="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 flex-shrink-0"><i class="fas fa-truck"></i></div>
+                    <div><p class="font-semibold text-gray-800">Free Delivery</p><p class="text-xs text-gray-500">Orders over $50 ship free</p></div>
+                </div>
+                <div class="flex items-center gap-4 text-sm">
+                    <div class="w-9 h-9 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 flex-shrink-0"><i class="fas fa-undo"></i></div>
+                    <div><p class="font-semibold text-gray-800">30-Day Returns</p><p class="text-xs text-gray-500">Free returns within 30 days</p></div>
+                </div>
+                <div class="flex items-center gap-4 text-sm">
+                    <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 flex-shrink-0"><i class="fas fa-shield-alt"></i></div>
+                    <div><p class="font-semibold text-gray-800">1-Year Warranty</p><p class="text-xs text-gray-500">Full manufacturer warranty</p></div>
+                </div>
+            </div>
+        </div>
+    </div>`;
+
+            // Thumbnail click handler
+            document.querySelectorAll('.thumb-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.thumb-btn').forEach(b => { b.classList.remove('border-purple-400'); b.classList.add('border-transparent', 'opacity-60'); });
+                    btn.classList.add('border-purple-400'); btn.classList.remove('border-transparent', 'opacity-60');
+                    const mainImg = document.getElementById('main-img');
+                    mainImg.style.opacity = '0';
+                    setTimeout(() => { mainImg.src = btn.dataset.src; mainImg.style.opacity = '1'; }, 200);
+                });
+            });
+
+            // Qty controls
+            let qty = 1;
+            document.getElementById('qty-plus').addEventListener('click', () => { if (qty < Math.min(stock, 10)) qty++; document.getElementById('qty-display').textContent = qty; });
+            document.getElementById('qty-minus').addEventListener('click', () => { if (qty > 1) qty--; document.getElementById('qty-display').textContent = qty; });
+
+            // Add to cart
+            document.getElementById('add-to-cart-btn').addEventListener('click', () => {
+                if (stock === 0) return;
+                const btn = document.getElementById('add-to-cart-btn');
+                btn.innerHTML = '<i class="fas fa-check"></i> Added!';
+                btn.classList.remove('from-purple-500', 'to-pink-500');
+                btn.classList.add('from-green-500', 'to-emerald-500');
+                TrackingAPI.track('add_to_cart', { product_id: p.product_id, category: p.category });
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-shopping-bag"></i> Add to Cart';
+                    btn.classList.add('from-purple-500', 'to-pink-500');
+                    btn.classList.remove('from-green-500', 'to-emerald-500');
+                }, 2000);
+            });
+
+            // Wishlist
+            document.getElementById('wishlist-btn').addEventListener('click', function () {
+                this.classList.toggle('text-pink-500');
+                const icon = this.querySelector('i');
+                icon.classList.toggle('far'); icon.classList.toggle('fas');
+            });
+        }
+
+        // ── Render Specifications ─────────────────────────────────────────────────────
+        function renderSpecs(product) {
+            const specsStr = product.specifications || '';
+            if (!specsStr) return;
+            const specs = specsStr.split(',').map(s => s.trim()).filter(Boolean);
+            if (!specs.length) return;
+            const section = document.getElementById('specs-section');
+            const cont = document.getElementById('specs-container');
+            section.classList.remove('hidden');
+            cont.innerHTML = specs.map(spec => {
+                const [key, ...vals] = spec.split(':');
+                return vals.length
+                    ? `<div class="bg-white/50 rounded-xl p-3"><div class="text-xs text-gray-400 font-medium uppercase">${key.trim()}</div><div class="font-semibold text-gray-800 mt-1">${vals.join(':').trim()}</div></div>`
+                    : `<div class="bg-white/50 rounded-xl p-3"><div class="font-semibold text-gray-700">${spec}</div></div>`;
+            }).join('');
+        }
+
+        // ── Similar Products ──────────────────────────────────────────────────────────
+        async function loadSimilar(productId) {
+            const data = await ProductsAPI.getSimilar(productId);
+            const cont = document.getElementById('similar-container');
+            cont.innerHTML = '';
+            if (!data || !data.similar_products) return;
+            data.similar_products.slice(0, 4).forEach(p => {
+                const img = p.image_url || getProductImageUrl(p);
+                const rating = parseFloat(p.rating) || 4.0;
+                cont.insertAdjacentHTML('beforeend', `
+        <div class="glass-card p-3 group">
+            <div class="relative rounded-xl overflow-hidden mb-3 aspect-[4/5] bg-white/50">
+                <img src="${img}" alt="${p.name}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" loading="lazy"
+                    onerror="this.onerror=null;this.src='https://picsum.photos/seed/${p.product_id + 150}/400/400'">
+                <a href="product-details.html?id=${p.product_id}" class="absolute inset-0 z-10"></a>
+            </div>
+            <h3 class="font-bold text-gray-800 text-sm truncate mb-1"><a href="product-details.html?id=${p.product_id}" class="hover:text-purple-600">${p.name}</a></h3>
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-gray-900">$${parseFloat(p.price).toFixed(2)}</span>
+                <span class="text-xs text-yellow-500"><i class="fas fa-star"></i> ${rating.toFixed(1)}</span>
+            </div>
+        </div>`);
+            });
+        }
+
+        // ── Bootstrap ─────────────────────────────────────────────────────────────────
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const productId = parseInt(params.get('id') || '1');
+
+            // Track view
+            TrackingAPI.track('view', { product_id: productId });
+
+            const product = await ProductsAPI.getOne(productId);
+            if (!product || product.error) {
+                document.getElementById('product-container').innerHTML = `
+        <div class="text-center py-20">
+            <div class="text-6xl mb-4">😕</div>
+            <h2 class="text-2xl font-bold text-gray-700 mb-2">Product Not Found</h2>
+            <a href="products.html" class="glass-button px-6 py-2 text-purple-600 font-semibold inline-block mt-4">Browse Products</a>
+        </div>`;
+                return;
+            }
+
+            renderProduct(product);
+            renderSpecs(product);
+            loadSimilar(productId);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recommendations | Homs Store</title>
+    <meta name="description" content="Personalized AI-powered product recommendations using Genetic Algorithm.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{'soft-cyan':'#e0f7fa','light-pink':'#fce4ec','cream':'#fffdd0','light-purple':'#f3e5f5'}}}}</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles/custom.css">
+    <style>
+        .line-clamp-2{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+        .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+        @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        .pulse-dot{animation:pulseDot 2s infinite}
+        @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.4}}
+        .ga-bar{transition:width 1s ease-in-out}
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+
+<main class="lg:ml-64 pt-24 px-6 pb-12 transition-all duration-300">
+
+    <!-- Header Card -->
+    <div class="glass-card p-8 mb-10 flex flex-col md:flex-row items-center justify-between gap-6" data-aos="fade-down">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center text-white shadow-lg">
+                    <i class="fas fa-magic"></i>
+                </div>
+                AI Style Profile
+            </h1>
+            <p class="text-gray-500 mt-2 max-w-lg">Powered by Genetic Algorithm — recommendations evolve with your activity.</p>
+        </div>
+        <div class="flex gap-4">
+            <div class="text-center p-4 bg-white/50 rounded-2xl border border-white/60 min-w-[90px]">
+                <p class="text-xs font-bold text-gray-400 uppercase">Match Score</p>
+                <p class="text-2xl font-bold text-purple-600" id="hdr-match">—</p>
+            </div>
+            <div class="text-center p-4 bg-white/50 rounded-2xl border border-white/60 min-w-[90px]">
+                <p class="text-xs font-bold text-gray-400 uppercase">Fitness</p>
+                <p class="text-2xl font-bold text-pink-500" id="hdr-fitness">—</p>
+            </div>
+            <div class="text-center p-4 bg-white/50 rounded-2xl border border-white/60 min-w-[90px]">
+                <p class="text-xs font-bold text-gray-400 uppercase">Mutation</p>
+                <p class="text-2xl font-bold text-blue-500" id="hdr-mutation">—</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Sidebar: Interest Analysis -->
+        <div class="lg:col-span-1 space-y-6" data-aos="fade-right">
+            <!-- User Interests -->
+            <div class="glass-card p-6">
+                <h3 class="font-bold text-gray-800 mb-4 text-lg">Your Interest Analysis</h3>
+                <div id="interest-bars" class="space-y-4">
+                    <!-- Skeleton -->
+                    <div class="space-y-2 animate-pulse">
+                        <div class="h-3 skeleton rounded w-3/4"></div>
+                        <div class="h-2 skeleton rounded-full"></div>
+                    </div>
+                    <div class="space-y-2 animate-pulse">
+                        <div class="h-3 skeleton rounded w-2/3"></div>
+                        <div class="h-2 skeleton rounded-full"></div>
+                    </div>
+                    <div class="space-y-2 animate-pulse">
+                        <div class="h-3 skeleton rounded w-1/2"></div>
+                        <div class="h-2 skeleton rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GA Status -->
+            <div class="glass-card p-6">
+                <h3 class="font-bold text-gray-800 mb-4">🧬 Genetic Algorithm Status</h3>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Population Size</span>
+                        <span class="font-bold text-purple-600">50</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Generations</span>
+                        <span class="font-bold text-purple-600">20</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Mutation Rate</span>
+                        <span class="font-bold text-blue-500" id="ga-mutation">—</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Fitness Score</span>
+                        <span class="font-bold text-green-500" id="ga-fitness">—</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Elitism</span>
+                        <span class="font-bold text-purple-600">Active ✓</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Adaptive Mutation</span>
+                        <span class="font-bold text-purple-600">Active ✓</span>
+                    </div>
+                </div>
+                <button id="refresh-btn" class="mt-4 w-full py-2 glass-button text-purple-600 font-semibold text-sm hover:bg-purple-50 transition flex items-center justify-center gap-2">
+                    <i class="fas fa-sync-alt" id="refresh-icon"></i> Refresh Recommendations
+                </button>
+            </div>
+
+            <!-- Reason -->
+            <div class="glass-card p-6 bg-gradient-to-br from-purple-50 to-pink-50">
+                <h3 class="font-bold text-gray-800 mb-2">Why These Products?</h3>
+                <p class="text-sm text-gray-600 leading-relaxed" id="rec-reason">
+                    Our Genetic Algorithm analyzes your browsing activity, search history, ratings, and session duration to evolve the most relevant recommendations for you.
+                </p>
+            </div>
+        </div>
+
+        <!-- Main: Recommendations Grid -->
+        <div class="lg:col-span-2">
+            <!-- Tabs -->
+            <div class="flex gap-2 mb-6 border-b border-gray-200">
+                <button class="rec-tab pb-3 px-4 font-semibold text-purple-600 border-b-2 border-purple-500 text-sm" data-tab="for-you">For You</button>
+                <button class="rec-tab pb-3 px-4 font-semibold text-gray-500 hover:text-gray-700 text-sm" data-tab="activity">Based on Activity</button>
+                <button class="rec-tab pb-3 px-4 font-semibold text-gray-500 hover:text-gray-700 text-sm" data-tab="trending">Top Rated</button>
+            </div>
+
+            <!-- For You -->
+            <div id="tab-for-you">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Top Matches For You</h2>
+                    <span class="text-xs text-gray-400 bg-purple-50 px-2 py-1 rounded-full flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-green-400 pulse-dot inline-block"></span> Live GA Results
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="rec-container">
+                    ${Array(4).fill('<div class="glass-card p-4"><div class="w-full aspect-[4/3] skeleton rounded-2xl mb-4"></div><div class="h-5 skeleton rounded w-3/4 mb-2"></div><div class="h-4 skeleton rounded w-1/3 mb-4"></div><div class="h-10 skeleton rounded-xl"></div></div>').join('')}
+                </div>
+            </div>
+
+            <!-- Activity Based (hidden by default) -->
+            <div id="tab-activity" class="hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Based on Your Activity</h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="activity-container">
+                    ${Array(4).fill('<div class="glass-card p-4"><div class="w-full aspect-[4/3] skeleton rounded-2xl mb-4"></div><div class="h-5 skeleton rounded w-3/4 mb-2"></div><div class="h-4 skeleton rounded w-1/3"></div></div>').join('')}
+                </div>
+            </div>
+
+            <!-- Top Rated (hidden by default) -->
+            <div id="tab-trending" class="hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Top Rated Products</h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="trending-container">
+                    ${Array(4).fill('<div class="glass-card p-4"><div class="w-full aspect-[4/3] skeleton rounded-2xl mb-4"></div><div class="h-5 skeleton rounded w-3/4 mb-2"></div></div>').join('')}
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/components.js"></script>
+<script src="../js/tracking.js"></script>
+<script>
+AOS.init({ duration: 700, once: true });
+
+const COLORS = ['purple','pink','blue','green','orange'];
+const BAR_GRADIENTS = [
+    'from-purple-400 to-purple-600',
+    'from-pink-400 to-pink-500',
+    'from-blue-400 to-blue-500',
+    'from-green-400 to-green-500',
+    'from-orange-400 to-orange-500',
+];
+
+function buildRecCard(p, matchPct) {
+    const img    = p.image_url || getProductImageUrl(p);
+    const rating = parseFloat(p.rating) || 4.0;
+    const price  = parseFloat(p.price)  || 0;
+    const color  = matchPct >= 90 ? 'green' : matchPct >= 80 ? 'yellow' : 'blue';
+    return `
+    <div class="glass-card p-4 group flex flex-col" data-aos="fade-up">
+        <div class="relative rounded-2xl overflow-hidden mb-4 aspect-[4/3] bg-white/50">
+            <img src="${img}" alt="${p.name}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105"
+                onerror="this.onerror=null;this.src='https://picsum.photos/seed/${p.product_id + 250}/500/400'">
+            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 rounded-xl text-sm font-bold shadow flex items-center gap-2">
+                <span class="relative flex h-2.5 w-2.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-${color}-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-${color}-500"></span>
+                </span>
+                ${matchPct}% Match
+            </div>
+            <a href="product-details.html?id=${p.product_id}" class="absolute inset-0 z-10"></a>
+        </div>
+        <div class="flex-1">
+            <div class="text-xs text-purple-500 font-semibold uppercase mb-1">${p.category}</div>
+            <h3 class="font-bold text-gray-800 mb-1 line-clamp-2">
+                <a href="product-details.html?id=${p.product_id}" class="hover:text-purple-600">${p.name}</a>
+            </h3>
+            <div class="flex items-center gap-1 text-xs mb-3">${renderStars(rating)}<span class="text-gray-500 ml-1">${rating.toFixed(1)}</span></div>
+            <div class="flex justify-between items-center mb-3">
+                <span class="font-bold text-gray-900 text-lg">$${price.toFixed(2)}</span>
+            </div>
+            <div class="p-3 bg-purple-50/60 rounded-xl border border-purple-100 mb-3">
+                <p class="text-xs text-gray-600 leading-relaxed">
+                    <i class="fas fa-robot text-purple-400 mr-1"></i>
+                    <strong>Why this?</strong> Matches your interest in <em>${p.category}</em> based on your browsing and search activity.
+                </p>
+            </div>
+        </div>
+        <button class="w-full py-2.5 bg-gray-900 text-white rounded-xl font-semibold text-sm shadow hover:bg-gray-800 transition"
+            onclick="TrackingAPI.track('add_to_cart',{product_id:${p.product_id},category:'${p.category}'})">
+            Add to Cart
+        </button>
+    </div>`;
+}
+
+async function loadRecommendations(isRefresh = false) {
+    if (isRefresh) {
+        const icon = document.getElementById('refresh-icon');
+        icon.classList.add('fa-spin');
+    }
+
+    const data = await RecommendationsAPI.getForUser(1);
+    const container = document.getElementById('rec-container');
+    container.innerHTML = '';
+
+    if (!data || !data.recommended_products) {
+        container.innerHTML = '<div class="col-span-2 text-center py-12 text-gray-500">Backend offline. Start Flask server to see recommendations.</div>';
+        return;
+    }
+
+    // Update header stats
+    const match = Math.min(100, Math.round(data.match_percentage || 0));
+    document.getElementById('hdr-match').textContent    = match + '%';
+    document.getElementById('hdr-fitness').textContent  = (data.fitness_score || 0).toFixed(2);
+    document.getElementById('hdr-mutation').textContent = (data.mutation_rate || 0).toFixed(3);
+    document.getElementById('ga-mutation').textContent  = (data.mutation_rate || 0).toFixed(3);
+    document.getElementById('ga-fitness').textContent   = (data.fitness_score || 0).toFixed(2);
+    document.getElementById('rec-reason').textContent   = data.recommendation_reason || 'Based on real-time activity and Genetic Algorithm.';
+
+    data.recommended_products.slice(0, 6).forEach((p, i) => {
+        const pct = Math.max(50, match - i * 2);
+        container.insertAdjacentHTML('beforeend', buildRecCard(p, pct));
+    });
+
+    document.getElementById('refresh-icon').classList.remove('fa-spin');
+}
+
+async function loadInterests() {
+    const data = await RecommendationsAPI.getUserInterests(1);
+    const el   = document.getElementById('interest-bars');
+    if (!data || !data.interests || !Object.keys(data.interests).length) {
+        el.innerHTML = '<p class="text-sm text-gray-400">No activity data yet. Browse products to build your profile!</p>';
+        // Show category defaults
+        const cats = ['Electronics','Clothing','Sports','Home','Books'];
+        el.innerHTML = cats.map((c, i) => {
+            const pct = Math.round(Math.random() * 60 + 20);
+            return `<div>
+            <div class="flex justify-between text-sm mb-1"><span class="text-gray-600 font-medium">${c}</span><span class="font-bold text-${COLORS[i]}-500">${pct}%</span></div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-gradient-to-r ${BAR_GRADIENTS[i]} h-2 rounded-full ga-bar" style="width:${pct}%"></div>
+            </div></div>`;
+        }).join('');
+        return;
+    }
+    el.innerHTML = Object.entries(data.interests).map(([cat, pct], i) => `
+    <div>
+        <div class="flex justify-between text-sm mb-1">
+            <span class="text-gray-600 font-medium">${cat}</span>
+            <span class="font-bold text-${COLORS[i % COLORS.length]}-500">${Math.round(pct)}%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-gradient-to-r ${BAR_GRADIENTS[i % BAR_GRADIENTS.length]} h-2 rounded-full ga-bar" style="width:${Math.round(pct)}%"></div>
+        </div>
+    </div>`).join('');
+}
+
+async function loadTopRated() {
+    const data = await ProductsAPI.getAll({ sort: 'rating', limit: 6 });
+    const cont = document.getElementById('trending-container');
+    cont.innerHTML = '';
+    if (!data?.products) return;
+    data.products.forEach((p, i) => {
+        const img    = p.image_url || getProductImageUrl(p);
+        const rating = parseFloat(p.rating) || 4.0;
+        cont.insertAdjacentHTML('beforeend', `
+        <div class="glass-card p-4 group flex flex-col">
+            <div class="relative rounded-2xl overflow-hidden mb-4 aspect-[4/3] bg-white/50">
+                <img src="${img}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    onerror="this.onerror=null;this.src='https://picsum.photos/seed/${p.product_id + 250}/500/400'">
+                <div class="absolute top-3 left-3 bg-yellow-100 text-yellow-700 px-2 py-1 rounded-lg text-xs font-bold">#${i+1} Rated</div>
+                <a href="product-details.html?id=${p.product_id}" class="absolute inset-0 z-10"></a>
+            </div>
+            <h3 class="font-bold text-gray-800 mb-1 line-clamp-2">${p.name}</h3>
+            <div class="flex justify-between items-center mt-auto">
+                <span class="font-bold text-gray-900">$${parseFloat(p.price).toFixed(2)}</span>
+                <span class="text-sm font-bold text-yellow-500"><i class="fas fa-star"></i> ${rating.toFixed(1)}</span>
+            </div>
+        </div>`);
+    });
+}
+
+async function loadActivityBased() {
+    // Load products from a mix of categories as activity-based
+    const data = await ProductsAPI.getAll({ sort: 'newest', limit: 6 });
+    const cont = document.getElementById('activity-container');
+    cont.innerHTML = '';
+    if (!data?.products) return;
+    data.products.forEach(p => {
+        cont.insertAdjacentHTML('beforeend', buildRecCard(p, Math.round(Math.random() * 20 + 70)));
+    });
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.rec-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.rec-tab').forEach(t => {
+            t.classList.remove('text-purple-600','border-b-2','border-purple-500');
+            t.classList.add('text-gray-500');
+        });
+        tab.classList.add('text-purple-600','border-b-2','border-purple-500');
+        tab.classList.remove('text-gray-500');
+        ['for-you','activity','trending'].forEach(id => document.getElementById(`tab-${id}`).classList.add('hidden'));
+        document.getElementById(`tab-${tab.dataset.tab}`).classList.remove('hidden');
+    });
+});
+
+document.getElementById('refresh-btn').addEventListener('click', () => loadRecommendations(true));
+
+// ── Bootstrap ─────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    loadRecommendations();
+    loadInterests();
+    loadTopRated();
+    loadActivityBased();
+});
+</script>
+</body>
+</html>

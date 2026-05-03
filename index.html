@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homs Store | Modern Shopping Experience</title>
+    
+    <!-- Tailwind CSS (CDN for development) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'soft-cyan': '#e0f7fa',
+                        'light-pink': '#fce4ec',
+                        'cream': '#fffdd0',
+                        'light-purple': '#f3e5f5',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./assets/styles/custom.css">
+    <style>
+        .line-clamp-2{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+        .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+        @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+
+    <!-- Main Content Area -->
+    <main class="lg:ml-64 pt-24 px-6 pb-12 transition-all duration-300">
+        
+        <!-- Hero Section -->
+        <section class="glass-card p-8 md:p-12 mb-12 flex flex-col md:flex-row items-center justify-between relative overflow-hidden" data-aos="fade-up">
+            <!-- Decorative blur blobs -->
+            <div class="absolute top-0 right-0 w-64 h-64 bg-pink-300 rounded-full blur-3xl opacity-40 -translate-y-1/2 translate-x-1/3"></div>
+            <div class="absolute bottom-0 left-0 w-48 h-48 bg-purple-300 rounded-full blur-3xl opacity-40 translate-y-1/3 -translate-x-1/4"></div>
+            
+            <div class="relative z-10 md:w-1/2 mb-8 md:mb-0">
+                <span class="inline-block py-1 px-3 rounded-full bg-purple-100 text-purple-600 text-sm font-bold mb-4 tracking-wider uppercase">New Collection</span>
+                <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-6 leading-tight">
+                    Discover Your <br>
+                    <span class="text-gradient">Perfect Style</span>
+                </h1>
+                <p class="text-gray-600 mb-8 max-w-md text-lg">
+                    Experience AI-driven recommendations tailored specifically for your unique taste and lifestyle.
+                </p>
+                <div class="flex gap-4">
+                    <a href="./pages/products.html" class="bg-gray-900 text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-800 transition shadow-lg hover:shadow-xl hover:-translate-y-1 inline-block">Shop Now</a>
+                    <a href="./pages/recommendations.html" class="glass-button px-8 py-3 text-gray-800 font-semibold inline-block">Explore AI</a>
+                </div>
+            </div>
+            
+            <div class="relative z-10 md:w-1/2 flex justify-center">
+                <!-- Placeholder for Hero Image -->
+                <div class="w-full max-w-md aspect-square rounded-[40px] overflow-hidden glass floating relative p-4">
+                    <img src="./assets/images/hero_image.png" alt="Fashion Model" class="w-full h-full object-cover rounded-[32px] shadow-sm">
+                    
+                    <!-- Floating badges -->
+                    <div class="absolute top-8 -right-4 glass-card p-3 flex items-center gap-2 animate-bounce" style="animation-duration: 3s;">
+                        <div class="w-8 h-8 rounded-full bg-yellow-100 text-yellow-500 flex items-center justify-center"><i class="fas fa-star text-xs"></i></div>
+                        <div>
+                            <p class="text-xs font-bold">Top Rated</p>
+                            <p class="text-[10px] text-gray-500">2k+ Reviews</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Recommendations Carousel Section -->
+        <section class="mb-12" data-aos="fade-up" data-aos-delay="100">
+            <div class="flex justify-between items-end mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fas fa-magic text-purple-500"></i> AI Top Matches for You
+                    </h2>
+                    <p class="text-sm text-gray-500 mt-1">Based on your recent activity</p>
+                </div>
+                <div class="flex gap-2">
+                    <button class="swiper-button-prev-custom w-10 h-10 rounded-full glass-button flex items-center justify-center text-gray-600 hover:text-purple-600"><i class="fas fa-chevron-left"></i></button>
+                    <button class="swiper-button-next-custom w-10 h-10 rounded-full glass-button flex items-center justify-center text-gray-600 hover:text-purple-600"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Swiper -->
+            <div class="swiper recommendationSwiper pb-8">
+                <div class="swiper-wrapper" id="rec-swiper-wrapper">
+                    <!-- Slide 1 -->
+                    <div class="swiper-slide">
+                        <div class="glass-card p-4 group">
+                            <div class="relative rounded-2xl overflow-hidden mb-4 aspect-[4/5]">
+                                <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Product" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                                <div class="absolute top-3 left-3 bg-white/80 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-purple-600 flex items-center gap-1">
+                                    <i class="fas fa-check-circle"></i> 98% Match
+                                </div>
+                                <button class="absolute top-3 right-3 w-8 h-8 rounded-full glass-button text-gray-500 hover:text-pink-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                <!-- Quick Add -->
+                                <div class="absolute bottom-0 left-0 w-full p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                    <button class="w-full py-2 bg-white/90 backdrop-blur-sm text-gray-900 rounded-xl font-semibold text-sm shadow-lg hover:bg-gray-900 hover:text-white transition">Quick Add</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="font-bold text-gray-800 text-sm truncate">Classic White Tee</h3>
+                                    <span class="font-bold text-gray-900">$24.99</span>
+                                </div>
+                                <p class="text-xs text-gray-500">Premium Cotton</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 2 -->
+                    <div class="swiper-slide">
+                        <div class="glass-card p-4 group">
+                            <div class="relative rounded-2xl overflow-hidden mb-4 aspect-[4/5]">
+                                <img src="https://images.unsplash.com/photo-1542272604-327c114c3384?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Product" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                                <div class="absolute top-3 left-3 bg-white/80 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-purple-600 flex items-center gap-1">
+                                    <i class="fas fa-check-circle"></i> 95% Match
+                                </div>
+                                <button class="absolute top-3 right-3 w-8 h-8 rounded-full glass-button text-gray-500 hover:text-pink-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                <div class="absolute bottom-0 left-0 w-full p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                    <button class="w-full py-2 bg-white/90 backdrop-blur-sm text-gray-900 rounded-xl font-semibold text-sm shadow-lg hover:bg-gray-900 hover:text-white transition">Quick Add</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="font-bold text-gray-800 text-sm truncate">Minimalist Backpack</h3>
+                                    <span class="font-bold text-gray-900">$59.00</span>
+                                </div>
+                                <p class="text-xs text-gray-500">Water Resistant</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 3 -->
+                    <div class="swiper-slide">
+                        <div class="glass-card p-4 group">
+                            <div class="relative rounded-2xl overflow-hidden mb-4 aspect-[4/5]">
+                                <img src="https://images.unsplash.com/photo-1591561954557-26941169b49e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Product" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                                <div class="absolute top-3 left-3 bg-white/80 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-purple-600 flex items-center gap-1">
+                                    <i class="fas fa-check-circle"></i> 92% Match
+                                </div>
+                                <button class="absolute top-3 right-3 w-8 h-8 rounded-full glass-button text-gray-500 hover:text-pink-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                <div class="absolute bottom-0 left-0 w-full p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                    <button class="w-full py-2 bg-white/90 backdrop-blur-sm text-gray-900 rounded-xl font-semibold text-sm shadow-lg hover:bg-gray-900 hover:text-white transition">Quick Add</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="font-bold text-gray-800 text-sm truncate">Urban Sneakers</h3>
+                                    <span class="font-bold text-gray-900">$85.00</span>
+                                </div>
+                                <p class="text-xs text-gray-500">Everyday Comfort</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slide 4 -->
+                    <div class="swiper-slide">
+                        <div class="glass-card p-4 group">
+                            <div class="relative rounded-2xl overflow-hidden mb-4 aspect-[4/5]">
+                                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Product" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                                <div class="absolute top-3 left-3 bg-white/80 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-purple-600 flex items-center gap-1">
+                                    <i class="fas fa-check-circle"></i> 89% Match
+                                </div>
+                                <button class="absolute top-3 right-3 w-8 h-8 rounded-full glass-button text-gray-500 hover:text-pink-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                                <div class="absolute bottom-0 left-0 w-full p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                    <button class="w-full py-2 bg-white/90 backdrop-blur-sm text-gray-900 rounded-xl font-semibold text-sm shadow-lg hover:bg-gray-900 hover:text-white transition">Quick Add</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="font-bold text-gray-800 text-sm truncate">Smart Watch</h3>
+                                    <span class="font-bold text-gray-900">$199.99</span>
+                                </div>
+                                <p class="text-xs text-gray-500">Fitness Tracker</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Sellers Grid -->
+        <section data-aos="fade-up" data-aos-delay="200">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Trending Now</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="trending-container">
+                <!-- Products will be generated dynamically -->
+            </div>
+            
+            <div class="mt-8 text-center">
+                <a href="./pages/products.html" class="glass-button px-6 py-2 inline-flex items-center gap-2 text-gray-700 font-medium">
+                    View All Products <i class="fas fa-arrow-right text-sm"></i>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Custom Scripts -->
+    <script src="./js/api.js"></script>
+    <script src="./js/components.js"></script>
+    <script src="./js/tracking.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 50
+        });
+
+        // Initialize Swiper
+        const swiper = new Swiper('.recommendationSwiper', {
+            slidesPerView: 1.2,
+            spaceBetween: 20,
+            navigation: {
+                nextEl: '.swiper-button-next-custom',
+                prevEl: '.swiper-button-prev-custom',
+            },
+            breakpoints: {
+                640: { slidesPerView: 2.2 },
+                768: { slidesPerView: 2.5 },
+                1024: { slidesPerView: 3.5 },
+                1280: { slidesPerView: 4.5 },
+            }
+        });
+
+        // Load Recommendation Carousel from real API
+        async function loadRecommendationCarousel() {
+            const wrapper = document.getElementById('rec-swiper-wrapper');
+            if (!wrapper) return;
+            // Show skeletons first
+            wrapper.innerHTML = Array(5).fill(`
+            <div class="swiper-slide">
+                <div class="glass-card p-4">
+                    <div class="w-full aspect-[4/5] skeleton rounded-2xl mb-4"></div>
+                    <div class="h-4 skeleton rounded w-3/4 mb-2"></div>
+                    <div class="h-3 skeleton rounded w-1/2"></div>
+                </div>
+            </div>`).join('');
+
+            const data = await RecommendationsAPI.getForUser(1);
+            wrapper.innerHTML = '';
+
+            const products = data?.recommended_products || [];
+            if (!products.length) {
+                // Fallback: load trending
+                const fallback = await ProductsAPI.getAll({ limit: 6, sort: 'rating' });
+                (fallback?.products || []).forEach(p => products.push(p));
+            }
+
+            const match = Math.round(data?.match_percentage || 85);
+            products.slice(0, 8).forEach((p, i) => {
+                const img   = p.image_url || getProductImageUrl(p);
+                const pct   = Math.max(50, match - i * 2);
+                const score = parseFloat(p.rating || 4.5).toFixed(1);
+                wrapper.insertAdjacentHTML('beforeend', `
+                <div class="swiper-slide">
+                    <div class="glass-card p-4 group">
+                        <div class="relative rounded-2xl overflow-hidden mb-4 aspect-[4/5]">
+                            <img src="${img}" alt="${p.name}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110"
+                                onerror="this.onerror=null;this.src='https://picsum.photos/seed/${p.product_id + 200}/500/600'">
+                            <div class="absolute top-3 left-3 bg-white/80 backdrop-blur-md px-2 py-1 rounded-lg text-xs font-bold text-purple-600 flex items-center gap-1">
+                                <i class="fas fa-check-circle"></i> ${pct}% Match
+                            </div>
+                            <button class="absolute top-3 right-3 w-8 h-8 rounded-full glass-button text-gray-500 hover:text-pink-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="far fa-heart"></i>
+                            </button>
+                            <div class="absolute bottom-0 left-0 w-full p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                <a href="./pages/product-details.html?id=${p.product_id}" class="block text-center w-full py-2 bg-white/90 backdrop-blur-sm text-gray-900 rounded-xl font-semibold text-sm shadow-lg hover:bg-gray-900 hover:text-white transition">View Details</a>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-purple-500 font-medium mb-0.5">${p.category}</div>
+                            <h3 class="font-bold text-gray-800 text-sm truncate line-clamp-2">${p.name}</h3>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="font-bold text-gray-900">$${parseFloat(p.price).toFixed(2)}</span>
+                                <div class="text-yellow-400 text-xs flex items-center gap-1"><i class="fas fa-star"></i> ${score}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`);
+            });
+            // Re-init swiper after content added
+            swiper.update();
+        }
+
+        // Load Trending Products
+        async function loadTrendingProducts() {
+            const container = document.getElementById('trending-container');
+            // Skeleton
+            container.innerHTML = Array(4).fill('<div class="glass-card p-4 animate-pulse"><div class="w-full aspect-square bg-gray-200 rounded-2xl mb-4"></div><div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div><div class="h-4 bg-gray-200 rounded w-1/3"></div></div>').join('');
+            const data = await ProductsAPI.getAll({ limit: 8, sort: 'rating' });
+            container.innerHTML = '';
+            if (!data?.products?.length) return;
+            data.products.slice(0,4).forEach((p, index) => {
+                container.insertAdjacentHTML('beforeend', buildProductCard(p, './'));
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTrendingProducts();
+            loadRecommendationCarousel();
+            gsap.from(".text-gradient", { duration: 1, y: 20, opacity: 0, delay: 0.5, ease: "power3.out" });
+        });
+    </script>
+</body>
+</html>

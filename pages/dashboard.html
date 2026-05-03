@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Homs Store</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'soft-cyan': '#e0f7fa',
+                        'light-pink': '#fce4ec',
+                        'cream': '#fffdd0',
+                        'light-purple': '#f3e5f5',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles/custom.css">
+    <style>.skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}</style>
+</head>
+<body class="antialiased min-h-screen">
+
+    <main class="lg:ml-64 pt-24 px-6 pb-12 transition-all duration-300">
+        
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4" data-aos="fade-in">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Dashboard Overview</h1>
+                <p class="text-gray-500 mt-1">Welcome back! Here's your store's performance.</p>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <a href="analytics.html" class="glass-button px-4 py-2 text-purple-600 font-medium">Detailed Analytics <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-aos="fade-up">
+            <div class="glass-card p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Total Revenue</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="stat-revenue">$...</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-500"><i class="fas fa-dollar-sign"></i></div>
+                </div>
+                <div class="flex items-center text-xs">
+                    <span class="text-green-500 font-bold flex items-center"><i class="fas fa-arrow-up mr-1"></i> Live</span>
+                    <span class="text-gray-400 ml-2">from backend</span>
+                </div>
+            </div>
+
+            <div class="glass-card p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Active Users</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="stat-users">...</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><i class="fas fa-users"></i></div>
+                </div>
+                <div class="flex items-center text-xs">
+                    <span class="text-green-500 font-bold flex items-center"><i class="fas fa-arrow-up mr-1"></i> Live</span>
+                    <span class="text-gray-400 ml-2">from backend</span>
+                </div>
+            </div>
+
+            <div class="glass-card p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Top Category</p>
+                        <h3 class="text-xl font-bold text-gray-800 mt-1 truncate" id="stat-category">...</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-500"><i class="fas fa-magic"></i></div>
+                </div>
+                <div class="flex items-center text-xs">
+                    <span class="text-green-500 font-bold flex items-center"><i class="fas fa-arrow-up mr-1"></i> Live</span>
+                    <span class="text-gray-400 ml-2">from backend</span>
+                </div>
+            </div>
+
+            <div class="glass-card p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Conversion Rate</p>
+                        <h3 class="text-2xl font-bold text-gray-800 mt-1" id="stat-conversion">...</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-500"><i class="fas fa-shopping-cart"></i></div>
+                </div>
+                <div class="flex items-center text-xs">
+                    <span class="text-red-500 font-bold flex items-center"><i class="fas fa-arrow-down mr-1"></i> Live</span>
+                    <span class="text-gray-400 ml-2">from backend</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8" data-aos="fade-up" data-aos-delay="100">
+            <!-- Sales Chart -->
+            <div class="glass-card p-6 lg:col-span-2">
+                <h3 class="font-bold text-gray-800 mb-6">GA Fitness Evolution</h3>
+                <div class="relative h-72 w-full">
+                    <canvas id="fitnessChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Recommendation Metrics -->
+            <div class="glass-card p-6 lg:col-span-1">
+                <h3 class="font-bold text-gray-800 mb-6">Genetic Algorithm Status</h3>
+                <div class="relative h-64 w-full flex items-center justify-center">
+                    <canvas id="doughnutChart"></canvas>
+                    <!-- Center Text -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <span class="text-3xl font-bold text-gray-800" id="mutation-display">...</span>
+                        <span class="text-xs text-gray-500">Mutation Rate</span>
+                    </div>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-4 text-center">
+                    <div>
+                        <div class="w-3 h-3 rounded-full bg-purple-500 mx-auto mb-1"></div>
+                        <p class="text-xs text-gray-500">Fitness</p>
+                        <p class="font-bold text-gray-800" id="fitness-score-text">...</p>
+                    </div>
+                    <div>
+                        <div class="w-3 h-3 rounded-full bg-pink-200 mx-auto mb-1"></div>
+                        <p class="text-xs text-gray-500">Generations</p>
+                        <p class="font-bold text-gray-800" id="generations-text">...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="200">
+            <h3 class="font-bold text-gray-800 mb-6">Recent AI Insights</h3>
+            
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-4 bg-white/40 rounded-xl border border-white/50">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-500"><i class="fas fa-lightbulb"></i></div>
+                        <div>
+                            <h4 class="font-bold text-gray-800 text-sm">Trend Alert: Minimalist Backpacks</h4>
+                            <p class="text-xs text-gray-500 mt-1">High conversion rate observed among users interested in 'Casual Wear'.</p>
+                        </div>
+                    </div>
+                    <button class="text-purple-600 text-sm font-semibold hover:underline">View</button>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-white/40 rounded-xl border border-white/50">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-500"><i class="fas fa-chart-line"></i></div>
+                        <div>
+                            <h4 class="font-bold text-gray-800 text-sm">Low Engagement: Formal Attire</h4>
+                            <p class="text-xs text-gray-500 mt-1">Consider updating product recommendations for this category.</p>
+                        </div>
+                    </div>
+                    <button class="text-purple-600 text-sm font-semibold hover:underline">Action</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Rated Products -->
+        <div class="glass-card p-6 mt-8" data-aos="fade-up" data-aos-delay="300">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="font-bold text-gray-800">Top Rated Products</h3>
+                <a href="products.html?sort=rating" class="text-sm text-purple-500 hover:underline font-medium">View All</a>
+            </div>
+            <div class="space-y-3" id="top-products-list">
+                <div class="h-14 skeleton rounded-xl"></div>
+                <div class="h-14 skeleton rounded-xl"></div>
+                <div class="h-14 skeleton rounded-xl"></div>
+                <div class="h-14 skeleton rounded-xl"></div>
+                <div class="h-14 skeleton rounded-xl"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/tracking.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+
+        // Chart.js Configuration
+        async function initDashboard() {
+            try {
+                // Fetch stats
+                const statsData = await DashboardAPI.getStats();
+                if (statsData) {
+                    document.getElementById('stat-revenue').innerText  = '$' + (statsData.total_revenue || 0).toFixed(2);
+                    document.getElementById('stat-users').innerText    = statsData.active_users || 0;
+                    document.getElementById('stat-category').innerText = statsData.top_category || 'N/A';
+                }
+                // Conversion rate
+                const convData = await AnalyticsAPI.getPurchaseRate();
+                if (convData) document.getElementById('stat-conversion').innerText = (convData.purchase_rate || 0).toFixed(1) + '%';
+
+                // Charts
+                const chartsData = await DashboardAPI.getCharts();
+
+                // Fitness Line Chart
+                const ctxFitness = document.getElementById('fitnessChart').getContext('2d');
+                let gradient = ctxFitness.createLinearGradient(0, 0, 0, 400);
+                gradient.addColorStop(0, 'rgba(168,85,247,0.5)');
+                gradient.addColorStop(1, 'rgba(168,85,247,0.0)');
+                const trend  = chartsData?.ga_accuracy_trend || [];
+                const labels = trend.length ? trend.map(d => 'Gen ' + d.generation) : ['Start'];
+                const values = trend.length ? trend.map(d => d.fitness) : [0];
+                new Chart(ctxFitness, {
+                    type: 'line',
+                    data: { labels, datasets: [{ label: 'Fitness Score', data: values, borderColor: '#a855f7', backgroundColor: gradient, borderWidth: 3, pointBackgroundColor: '#fff', pointBorderColor: '#a855f7', pointBorderWidth: 2, pointRadius: 4, fill: true, tension: 0.4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)', borderDash: [5,5] } }, x: { grid: { display: false } } } }
+                });
+
+                // GA Doughnut
+                const ctxD = document.getElementById('doughnutChart').getContext('2d');
+                const latFit = chartsData?.latest_fitness || 0;
+                const latMut = chartsData?.latest_mutation || 0.1;
+                document.getElementById('mutation-display').innerText  = latMut.toFixed(2);
+                document.getElementById('fitness-score-text').innerText = latFit.toFixed(2);
+                document.getElementById('generations-text').innerText   = labels.length;
+                new Chart(ctxD, {
+                    type: 'doughnut',
+                    data: { labels: ['Mutation','Base'], datasets: [{ data: [latMut*100, 100-(latMut*100)], backgroundColor: ['#a855f7','#fbcfe8'], borderWidth: 0, hoverOffset: 4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
+                });
+
+                // Load top products
+                const topData = await ProductsAPI.getAll({ sort: 'rating', limit: 5 });
+                if (topData?.products) {
+                    const tpCont = document.getElementById('top-products-list');
+                    if (tpCont) {
+                        tpCont.innerHTML = topData.products.map((p, i) => `
+                        <div class="flex items-center gap-4 p-3 bg-white/40 rounded-xl border border-white/50">
+                            <span class="text-lg font-bold text-purple-300 w-6 text-center">${i+1}</span>
+                            <img src="${p.image_url || getProductImageUrl(p)}" class="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                                onerror="this.onerror=null;this.src='https://picsum.photos/seed/${p.product_id + 50}/80/80'">
+                            <div class="flex-1 min-w-0">
+                                <div class="font-bold text-gray-800 text-sm truncate">${p.name}</div>
+                                <div class="text-xs text-gray-500">${p.category}</div>
+                            </div>
+                            <div class="text-yellow-500 text-xs font-bold"><i class="fas fa-star"></i> ${parseFloat(p.rating||4).toFixed(1)}</div>
+                        </div>`).join('');
+                    }
+                }
+
+            } catch (error) {
+                console.error("Error loading dashboard:", error);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>

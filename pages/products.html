@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | Homs Store</title>
+    <meta name="description" content="Browse all products at Homs Store — Electronics, Clothing, Sports, Home, Books with AI-powered recommendations.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={theme:{extend:{colors:{'soft-cyan':'#e0f7fa','light-pink':'#fce4ec','cream':'#fffdd0','light-purple':'#f3e5f5'}}}}</script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/styles/custom.css">
+    <style>
+        .line-clamp-2{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+        .category-pill.active{background:linear-gradient(135deg,#a855f7,#ec4899);color:#fff;border-color:transparent}
+        .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+        @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+
+<main class="lg:ml-64 pt-24 px-6 pb-12 transition-all duration-300">
+
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-gray-500 mb-4 flex items-center gap-2" id="breadcrumb">
+        <a href="../index.html" class="hover:text-purple-600 transition">Home</a>
+        <i class="fas fa-chevron-right text-[10px]"></i>
+        <span class="text-gray-800 font-medium" id="breadcrumb-label">All Products</span>
+    </nav>
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4" data-aos="fade-in">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800" id="page-title">All Products</h1>
+            <p class="text-gray-500 mt-1 text-sm" id="results-count">Loading products...</p>
+        </div>
+        <div class="flex items-center gap-3 w-full md:w-auto">
+            <!-- Search -->
+            <div class="relative flex-1 md:hidden">
+                <input type="text" id="mobile-search" placeholder="Search..." class="w-full bg-white/50 border border-white/60 rounded-full py-2 px-5 pl-10 focus:outline-none focus:ring-2 focus:ring-purple-300 text-sm">
+                <i class="fas fa-search absolute left-4 top-2.5 text-gray-400 text-xs"></i>
+            </div>
+            <!-- Sort -->
+            <div class="relative">
+                <select id="sort-select" class="appearance-none glass-button px-4 py-2 pr-8 text-gray-700 outline-none text-sm cursor-pointer">
+                    <option value="">Recommended</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                    <option value="rating">Top Rated</option>
+                    <option value="newest">Newest</option>
+                </select>
+                <i class="fas fa-chevron-down absolute right-3 top-3 text-xs text-gray-500 pointer-events-none"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Pills -->
+    <div class="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide" id="category-pills" data-aos="fade-right">
+        <button class="category-pill active flex-shrink-0 px-4 py-2 rounded-full border border-purple-300 text-sm font-semibold transition" data-cat="">All</button>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-8">
+        <!-- Filters Sidebar -->
+        <aside class="w-full md:w-56 flex-shrink-0" id="filters-sidebar" data-aos="fade-right">
+            <div class="glass-card p-5 sticky top-24">
+                <div class="flex justify-between items-center mb-5">
+                    <h3 class="font-bold text-gray-800">Filters</h3>
+                    <button id="clear-filters" class="text-xs text-purple-500 hover:text-purple-700 font-semibold">Clear All</button>
+                </div>
+                <!-- Price Range -->
+                <div class="mb-5">
+                    <h4 class="font-semibold text-gray-700 mb-3 text-sm">Price Range</h4>
+                    <input type="range" id="price-range" min="0" max="2000" value="2000" class="w-full accent-purple-500 h-1 bg-gray-200 rounded-lg cursor-pointer">
+                    <div class="flex justify-between text-xs text-gray-500 mt-2">
+                        <span>$0</span><span id="price-label">$2000+</span>
+                    </div>
+                </div>
+                <!-- Rating Filter -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 text-sm">Min Rating</h4>
+                    <div class="flex gap-2 flex-wrap" id="rating-filter">
+                        <button class="rating-btn px-3 py-1 rounded-full border border-gray-200 text-xs font-semibold hover:border-purple-400 transition" data-rating="0">All</button>
+                        <button class="rating-btn px-3 py-1 rounded-full border border-gray-200 text-xs font-semibold hover:border-purple-400 transition" data-rating="4">4★+</button>
+                        <button class="rating-btn px-3 py-1 rounded-full border border-gray-200 text-xs font-semibold hover:border-purple-400 transition" data-rating="4.5">4.5★+</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Product Grid -->
+        <div class="flex-1">
+            <!-- AI Recommendations Strip -->
+            <div id="rec-strip" class="mb-8 hidden">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-lg font-bold text-gray-800"><i class="fas fa-magic text-purple-500 mr-2"></i>Recommended For You</h2>
+                    <span class="text-xs text-gray-500 bg-purple-50 px-2 py-1 rounded-full">AI powered</span>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="rec-container"></div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="products-container">
+                <!-- Skeletons -->
+                ${Array(6).fill('<div class="glass-card p-4"><div class="w-full aspect-square skeleton rounded-2xl mb-4"></div><div class="h-3 skeleton rounded w-1/3 mb-2"></div><div class="h-4 skeleton rounded w-3/4 mb-2"></div><div class="h-3 skeleton rounded w-1/2 mb-3"></div></div>').join('')}
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden text-center py-20">
+                <div class="text-6xl mb-4">🔍</div>
+                <h3 class="text-xl font-bold text-gray-700 mb-2">No products found</h3>
+                <p class="text-gray-500 mb-6">Try adjusting your filters or search query.</p>
+                <button onclick="resetFilters()" class="glass-button px-6 py-2 text-purple-600 font-semibold">Clear Filters</button>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-center mt-10 gap-2" id="pagination"></div>
+        </div>
+    </div>
+</main>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/components.js"></script>
+<script src="../js/tracking.js"></script>
+<script>
+AOS.init({ duration: 700, once: true });
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let state = {
+    category: '',
+    sort: '',
+    query: '',
+    maxPrice: 2000,
+    minRating: 0,
+    page: 1,
+    limit: 12,
+    totalPages: 1,
+};
+
+// Read URL params on load
+(function initFromURL() {
+    const p = new URLSearchParams(window.location.search);
+    state.category = p.get('category') || '';
+    state.query    = p.get('q') || '';
+    state.page     = parseInt(p.get('page') || '1');
+})();
+
+// ── Category Pills ────────────────────────────────────────────────────────────
+async function loadCategoryPills() {
+    const data = await ProductsAPI.getCategories();
+    if (!data) return;
+    const pills = document.getElementById('category-pills');
+    data.categories.forEach(cat => {
+        const active = state.category.toLowerCase() === cat.name.toLowerCase();
+        pills.insertAdjacentHTML('beforeend', `
+        <button class="category-pill flex-shrink-0 px-4 py-2 rounded-full border border-gray-200 text-sm font-semibold transition ${active ? 'active' : 'text-gray-600 hover:border-purple-300'}" data-cat="${cat.name}">
+            ${cat.name} <span class="text-xs opacity-70">(${cat.count})</span>
+        </button>`);
+    });
+
+    pills.querySelectorAll('.category-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+            state.category = btn.dataset.cat;
+            state.page = 1;
+            pills.querySelectorAll('.category-pill').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            updateURL();
+            loadProducts();
+        });
+    });
+
+    // Set first "All" pill active state
+    const allPill = pills.querySelector('[data-cat=""]');
+    if (allPill && !state.category) allPill.classList.add('active');
+}
+
+// ── Products Loader ───────────────────────────────────────────────────────────
+async function loadProducts() {
+    const container = document.getElementById('products-container');
+    const empty = document.getElementById('empty-state');
+    container.innerHTML = Array(6).fill(`
+    <div class="glass-card p-4">
+        <div class="w-full aspect-square skeleton rounded-2xl mb-4"></div>
+        <div class="h-3 skeleton rounded w-1/3 mb-2"></div>
+        <div class="h-4 skeleton rounded w-3/4 mb-2"></div>
+        <div class="h-3 skeleton rounded w-1/2"></div>
+    </div>`).join('');
+    empty.classList.add('hidden');
+
+    const params = {
+        page: state.page,
+        limit: state.limit,
+        category: state.category,
+        sort: state.sort,
+        q: state.query,
+    };
+    Object.keys(params).forEach(k => { if (!params[k]) delete params[k]; });
+
+    const data = await ProductsAPI.getAll(params);
+    container.innerHTML = '';
+
+    if (!data || !data.products || data.products.length === 0) {
+        empty.classList.remove('hidden');
+        document.getElementById('results-count').textContent = 'No results found.';
+        document.getElementById('pagination').innerHTML = '';
+        return;
+    }
+
+    // Update header
+    const label = state.category || 'All Products';
+    document.getElementById('page-title').textContent = label;
+    document.getElementById('breadcrumb-label').textContent = label;
+    document.getElementById('results-count').textContent =
+        `Showing ${(state.page - 1) * state.limit + 1}–${Math.min(state.page * state.limit, data.total)} of ${data.total} products` +
+        (state.query ? ` for "${state.query}"` : '');
+
+    // Filter client-side by price & rating
+    const products = data.products.filter(p =>
+        parseFloat(p.price) <= state.maxPrice &&
+        parseFloat(p.rating || 0) >= state.minRating
+    );
+
+    if (!products.length) { empty.classList.remove('hidden'); return; }
+
+    products.forEach(p => {
+        container.insertAdjacentHTML('beforeend', buildProductCard(p, '../'));
+    });
+
+    state.totalPages = data.pages;
+    renderPagination(data.pages);
+}
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+function renderPagination(total) {
+    const el = document.getElementById('pagination');
+    if (total <= 1) { el.innerHTML = ''; return; }
+    let html = '';
+    const prev = state.page > 1;
+    const next = state.page < total;
+    html += `<button onclick="goToPage(${state.page - 1})" class="w-10 h-10 rounded-full glass-button flex items-center justify-center ${prev ? 'text-gray-700 hover:text-purple-600' : 'text-gray-300 cursor-not-allowed'}" ${prev ? '' : 'disabled'}><i class="fas fa-chevron-left"></i></button>`;
+    for (let i = 1; i <= total; i++) {
+        if (i === 1 || i === total || Math.abs(i - state.page) <= 1) {
+            html += `<button onclick="goToPage(${i})" class="w-10 h-10 rounded-full ${i === state.page ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold shadow-lg' : 'glass-button text-gray-700 hover:text-purple-600'}">${i}</button>`;
+        } else if (Math.abs(i - state.page) === 2) {
+            html += `<span class="flex items-center px-1 text-gray-400">...</span>`;
+        }
+    }
+    html += `<button onclick="goToPage(${state.page + 1})" class="w-10 h-10 rounded-full glass-button flex items-center justify-center ${next ? 'text-gray-700 hover:text-purple-600' : 'text-gray-300 cursor-not-allowed'}" ${next ? '' : 'disabled'}><i class="fas fa-chevron-right"></i></button>`;
+    el.innerHTML = html;
+}
+
+function goToPage(p) {
+    if (p < 1 || p > state.totalPages) return;
+    state.page = p;
+    updateURL();
+    loadProducts();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Recommendations Strip ─────────────────────────────────────────────────────
+async function loadRecommendations() {
+    const data = await RecommendationsAPI.getForUser(1);
+    if (!data || !data.recommended_products) return;
+    const strip = document.getElementById('rec-strip');
+    const cont  = document.getElementById('rec-container');
+    strip.classList.remove('hidden');
+    data.recommended_products.slice(0, 3).forEach(p => {
+        cont.insertAdjacentHTML('beforeend', buildProductCard(p, '../'));
+    });
+}
+
+// ── Filters & URL ─────────────────────────────────────────────────────────────
+function updateURL() {
+    const params = new URLSearchParams();
+    if (state.category) params.set('category', state.category);
+    if (state.query)    params.set('q', state.query);
+    if (state.page > 1) params.set('page', state.page);
+    const newURL = window.location.pathname + (params.toString() ? '?' + params : '');
+    history.pushState({}, '', newURL);
+}
+
+function resetFilters() {
+    state = { category: '', sort: '', query: '', maxPrice: 2000, minRating: 0, page: 1, limit: 12, totalPages: 1 };
+    document.getElementById('sort-select').value = '';
+    document.getElementById('price-range').value = 2000;
+    document.getElementById('price-label').textContent = '$2000+';
+    document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('border-purple-500', 'text-purple-600'));
+    document.querySelectorAll('.category-pill').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-cat=""]')?.classList.add('active');
+    updateURL();
+    loadProducts();
+}
+
+// ── Event Listeners ───────────────────────────────────────────────────────────
+document.getElementById('sort-select').addEventListener('change', (e) => {
+    state.sort = e.target.value; state.page = 1; loadProducts();
+});
+
+document.getElementById('price-range').addEventListener('input', (e) => {
+    state.maxPrice = parseInt(e.target.value);
+    document.getElementById('price-label').textContent = `$${state.maxPrice}${state.maxPrice >= 2000 ? '+' : ''}`;
+    clearTimeout(window._priceTimer);
+    window._priceTimer = setTimeout(() => { state.page = 1; loadProducts(); }, 500);
+});
+
+document.getElementById('clear-filters').addEventListener('click', resetFilters);
+
+document.getElementById('mobile-search')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        state.query = e.target.value.trim();
+        state.page = 1;
+        updateURL();
+        loadProducts();
+    }
+});
+
+document.getElementById('rating-filter').addEventListener('click', (e) => {
+    const btn = e.target.closest('.rating-btn');
+    if (!btn) return;
+    document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('border-purple-500', 'text-purple-600', 'bg-purple-50'));
+    btn.classList.add('border-purple-500', 'text-purple-600', 'bg-purple-50');
+    state.minRating = parseFloat(btn.dataset.rating);
+    state.page = 1;
+    loadProducts();
+});
+
+// ── Bootstrap ─────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    loadCategoryPills();
+    loadProducts();
+    loadRecommendations();
+});
+</script>
+</body>
+</html>
